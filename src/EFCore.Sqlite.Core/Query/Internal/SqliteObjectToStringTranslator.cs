@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Data;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace Microsoft.EntityFrameworkCore.Sqlite.Query.Internal;
@@ -96,6 +97,26 @@ public class SqliteObjectToStringTranslator : IMethodCallTranslator
                         _sqlExpressionFactory.Constant(false.ToString()))
                 },
                 _sqlExpressionFactory.Constant(true.ToString()));
+        }
+
+        if (instance.Type.IsEnum)
+        {
+            if (instance.TypeMapping?.DbType == DbType.String
+                || string.Equals(instance.TypeMapping?.StoreType, "TEXT", StringComparison.OrdinalIgnoreCase))
+            {
+                return _sqlExpressionFactory.MakeUnary(ExpressionType.Convert, instance, typeof(string));
+            }
+            else
+            {
+                var cases = Enum.GetValues(instance.Type)
+                    .Cast<object>()
+                    .Select(value => new CaseWhenClause(
+                        _sqlExpressionFactory.Equal(instance, _sqlExpressionFactory.Constant(value)),
+                        _sqlExpressionFactory.Constant(value?.ToString(), typeof(string))))
+                    .ToArray();
+
+                return _sqlExpressionFactory.Case(cases, _sqlExpressionFactory.Constant(null, typeof(string)));
+            }
         }
 
         return TypeMapping.Contains(instance.Type)
