@@ -115,7 +115,7 @@ public class SqliteObjectToStringTranslator : IMethodCallTranslator
                         _sqlExpressionFactory.Constant(value?.ToString(), typeof(string))))
                     .ToArray();
 
-                return _sqlExpressionFactory.Case(cases, _sqlExpressionFactory.Constant(null, typeof(string)));
+                return _sqlExpressionFactory.Case(cases, _sqlExpressionFactory.Constant(string.Empty, typeof(string)));
             }
         }
 
