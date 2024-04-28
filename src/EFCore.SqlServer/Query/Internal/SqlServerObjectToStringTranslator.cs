@@ -105,7 +105,7 @@ public class SqlServerObjectToStringTranslator : IMethodCallTranslator
             if (instance.TypeMapping?.DbType == DbType.String
                 || string.Equals(instance.TypeMapping?.StoreTypeNameBase, "VARCHAR", StringComparison.OrdinalIgnoreCase))
             {
-                return _sqlExpressionFactory.MakeUnary(ExpressionType.Convert, instance, typeof(string));
+                return instance;
             }
             else
             {

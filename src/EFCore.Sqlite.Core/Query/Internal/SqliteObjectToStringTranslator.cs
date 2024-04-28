@@ -104,7 +104,7 @@ public class SqliteObjectToStringTranslator : IMethodCallTranslator
             if (instance.TypeMapping?.DbType == DbType.String
                 || string.Equals(instance.TypeMapping?.StoreType, "TEXT", StringComparison.OrdinalIgnoreCase))
             {
-                return _sqlExpressionFactory.MakeUnary(ExpressionType.Convert, instance, typeof(string));
+                return instance;
             }
             else
             {
