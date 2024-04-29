@@ -99,27 +99,7 @@ public class SqliteObjectToStringTranslator : IMethodCallTranslator
                 _sqlExpressionFactory.Constant(true.ToString()));
         }
 
-        if (instance.Type.IsEnum)
-        {
-            if (instance.TypeMapping?.DbType == DbType.String
-                || string.Equals(instance.TypeMapping?.StoreType, "TEXT", StringComparison.OrdinalIgnoreCase))
-            {
-                return instance;
-            }
-            else
-            {
-                var cases = Enum.GetValues(instance.Type)
-                    .Cast<object>()
-                    .Select(value => new CaseWhenClause(
-                        _sqlExpressionFactory.Equal(instance, _sqlExpressionFactory.Constant(value)),
-                        _sqlExpressionFactory.Constant(value?.ToString(), typeof(string))))
-                    .ToArray();
-
-                return _sqlExpressionFactory.Case(cases, _sqlExpressionFactory.Constant(string.Empty, typeof(string)));
-            }
-        }
-
-        return TypeMapping.Contains(instance.Type)
+        return TypeMapping.Contains(instance.Type) || instance.Type.IsEnum
             ? _sqlExpressionFactory.Convert(instance, typeof(string))
             : null;
     }

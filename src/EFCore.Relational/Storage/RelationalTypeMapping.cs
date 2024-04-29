@@ -572,7 +572,7 @@ public abstract class RelationalTypeMapping : CoreTypeMapping
     {
         value = NormalizeEnumValue(value);
 
-        if (Converter != null && Converter.ProviderClrType.UnwrapNullableType() != value?.GetType())
+        if (Converter != null)
         {
             value = Converter.ConvertToProvider(value);
         }

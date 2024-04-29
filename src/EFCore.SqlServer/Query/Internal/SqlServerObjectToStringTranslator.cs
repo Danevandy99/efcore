@@ -102,22 +102,7 @@ public class SqlServerObjectToStringTranslator : IMethodCallTranslator
 
         if (instance.Type.IsEnum)
         {
-            if (instance.TypeMapping?.DbType == DbType.String
-                || string.Equals(instance.TypeMapping?.StoreTypeNameBase, "VARCHAR", StringComparison.OrdinalIgnoreCase))
-            {
-                return instance;
-            }
-            else
-            {
-                var cases = Enum.GetValues(instance.Type)
-                    .Cast<object>()
-                    .Select(value => new CaseWhenClause(
-                        _sqlExpressionFactory.Equal(instance, _sqlExpressionFactory.Constant(value)),
-                        _sqlExpressionFactory.Constant(value?.ToString(), typeof(string))))
-                    .ToArray();
-
-                return _sqlExpressionFactory.Case(cases, _sqlExpressionFactory.Constant(string.Empty, typeof(string)));
-            }
+            return _sqlExpressionFactory.Convert(instance, typeof(string));
         }
 
         return TypeMapping.TryGetValue(instance.Type, out var storeType)
